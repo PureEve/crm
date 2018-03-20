@@ -12,7 +12,7 @@
 
     <context:property-placeholder location="classpath:jdbc.properties" />
 
-    <context:component-scan base-package="com.shsxt.crm">
+    <context:component-scan base-package="com.shsxt.crm.biz">
         <context:exclude-filter type="annotation"
                                 expression="org.springframework.stereotype.Controller" />
     </context:component-scan>
@@ -33,6 +33,19 @@
     <bean id="txManager"
           class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
         <property name="dataSource" ref="dataSource"></property>
+    </bean>
+
+    <!-- 配置 sqlSessionFactory -->
+    <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <property name="dataSource" ref="dataSource"></property>
+        <property name="configLocation" value="classpath:mybatis-context.xml"></property>
+        <property name="mapperLocations" value="classpath:com/shsxt/crm/biz/dao/mapper/*.xml" />
+    </bean>
+
+    <!-- 配置扫描器 -->
+    <bean id="mapperScanner" class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <property name="basePackage" value="com.shsxt.crm.biz.dao" />
+        <property name="sqlSessionFactoryBeanName" value="sqlSessionFactory" />
     </bean>
 
 </beans>
