@@ -12,7 +12,7 @@
 
     <context:property-placeholder location="classpath:jdbc.properties" />
 
-    <context:component-scan base-package="com.shsxt.crm.biz">
+    <context:component-scan base-package="com.shsxt.crm">
         <context:exclude-filter type="annotation"
                                 expression="org.springframework.stereotype.Controller" />
     </context:component-scan>

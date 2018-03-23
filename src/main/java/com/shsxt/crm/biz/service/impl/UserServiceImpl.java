@@ -7,8 +7,10 @@ import com.shsxt.crm.core.common.util.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import java.util.Date;
 
 @Service
 public class UserServiceImpl  implements IUserService{//提示  alt + enter
@@ -21,6 +23,9 @@ public class UserServiceImpl  implements IUserService{//提示  alt + enter
 
     @Autowired (required = false)
     private HttpServletResponse resp;
+
+    @Autowired (required = false)
+    private HttpServletRequest req;
 
 
     @Override
@@ -35,8 +40,37 @@ public class UserServiceImpl  implements IUserService{//提示  alt + enter
             return Result.fail("用户登录失败，请核实账户或密码。");
 
         //登录成功
+        session.setAttribute("userName",user.getUserName());
+        session.setAttribute("TrueName",user.getTrueName());
         VerificationLoginUtil.userLoginTools(session,resp,user);
 
         return Result.success("登录成功");
+    }
+
+    @Override
+    public Result userModifyPassword(String userName, String oldPassword, String newPassword, String confirmPassword) {
+        //
+        User user = VerificationLoginUtil.getUserInfoFromSession(req);
+
+        if (StringUtil.isNotEmpty(newPassword) &&  !newPassword.equals(confirmPassword)) {
+            return Result.fail("两次输出密码不相同");
+        }
+        if (!user.getUserName().equals(userName) ||! user.getUserPwd().equals(Md5Util.encode(oldPassword))) {
+            return Result.fail("用户不存在或者密码不正确");
+        }
+        if (oldPassword.equals(newPassword)) {
+            return Result.fail("新密码不能够原密码相同");
+        }
+
+        //修改密码
+        User user1 = new User();
+        user1.setUserName(userName);
+        user1.setUserPwd(Md5Util.encode(newPassword));
+        user1.setUpdateDate(new Date());
+        int res = userDao.updateUserPwdByUserName(user1);
+
+        if (res == 1)
+            return   Result.success("修改成功");
+        return   Result.fail("修改失败");
     }
 }

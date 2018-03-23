@@ -5,4 +5,7 @@ import org.apache.ibatis.annotations.Param;
 
 public interface  UserDao{
         User queryUserByUserName(@Param("userName") String  userName);
+
+        int updateUserPwdByUserName (User user);
+
 }
